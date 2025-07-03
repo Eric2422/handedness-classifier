@@ -22,7 +22,6 @@ print(left_images)
 # Get all images of right-handed writing
 right_files = [file for file in natsort.natsorted(os.listdir(
     RIGHT_DIRECTORY)) if pathlib.Path(file).suffix.lower() in ACCEPTED_EXTENSIONS]
-print(right_files)
 
 right_images = [ski.io.imread(RIGHT_DIRECTORY / file) for file in right_files]
 print(right_images)
