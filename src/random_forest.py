@@ -1,38 +1,44 @@
-from os import listdir
-from pathlib import Path
+import os
+import pathlib
 
-from natsort import natsorted
+import joblib
+import natsort
 import skimage as ski
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+import sklearn.ensemble
+import sklearn.model_selection
 
+IMAGE_DIRECTORY = pathlib.Path('./img')
+"""The directory that stores images of handwriting."""
+LEFT_DIRECTORY = IMAGE_DIRECTORY / 'left'
+"""The directory that stores images of left-handed writing."""
+RIGHT_DIRECTORY = IMAGE_DIRECTORY / 'right'
+"""The directory that stores images of right-handed writing."""
 
-IMG_DIRECTORY = Path('./img')
-LEFT_DIRECTORY = IMG_DIRECTORY / 'left'
-RIGHT_DIRECTORY = IMG_DIRECTORY / 'right'
+IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
+"""List of accepted image file extensions."""
 
-# List of accepted image file extensions
-ACCEPTED_EXTENSIONS = ('.jpg', '.jpeg', '.png')
+MODEL_DIRECTORY = pathlib.Path('./model')
+memory = joblib.Memory(MODEL_DIRECTORY)
 
 # Get all the images of left-handed writing
-left_files = [file for file in natsorted(listdir(
-    LEFT_DIRECTORY)) if Path(file).suffix.lower() in ACCEPTED_EXTENSIONS]
+left_files = [file for file in natsort.natsorted(os.listdir(
+    LEFT_DIRECTORY)) if  pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS]
 left_images = [ski.io.imread(LEFT_DIRECTORY / file) for file in left_files]
 
 # Get all images of right-handed writing
-right_files = [file for file in natsorted(listdir(
-    RIGHT_DIRECTORY)) if Path(file).suffix.lower() in ACCEPTED_EXTENSIONS]
+right_files = [file for file in natsort.natsorted(os.listdir(
+    RIGHT_DIRECTORY)) if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS]
 right_images = [ski.io.imread(RIGHT_DIRECTORY / file) for file in right_files]
 
 # Combine the data into a single array
 x_data = [img for img in left_images + right_images]
 y_data = [0] * len(left_images) + [1] * len(right_images)
 
-x_train, x_test, y_train, y_test = train_test_split(
+x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(
     x_data, y_data, test_size=0.2
 )
 
-clf = RandomForestClassifier()
+clf = sklearn.ensemble.RandomForestClassifier()
 clf = clf.fit(x_train, y_train)
 
 # Check the accuracy of the model
