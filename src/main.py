@@ -32,7 +32,7 @@ print(x_data)
 y_data = [0] * len(left_images) + [1] * len(right_images)
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x_data, y_data
+    x_data, y_data, test_size=0.2
 )
 
 clf = RandomForestClassifier()
