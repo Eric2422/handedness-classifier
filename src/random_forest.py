@@ -39,6 +39,9 @@ x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(
 )
 
 clf = sklearn.ensemble.RandomForestClassifier()
+
+# Cache the tree to avoid having to retrain the it each time the program runs. 
+memory.cache(clf.fit)
 clf = clf.fit(x_train, y_train)
 
 # Check the accuracy of the model
