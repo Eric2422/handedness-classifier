@@ -17,7 +17,7 @@ RIGHT_DIRECTORY = IMAGE_DIRECTORY / 'right'
 IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 """List of accepted image file extensions."""
 
-MODEL_DIRECTORY = pathlib.Path('./model')
+MODEL_DIRECTORY = pathlib.Path('./cache')
 memory = joblib.Memory(MODEL_DIRECTORY)
 
 # Get all the images of left-handed writing
