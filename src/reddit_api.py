@@ -1,4 +1,8 @@
 import time
 
-import requests
+import praw
+import pathlib
 
+reddit = praw.Reddit(
+    site_name='bot'
+)
