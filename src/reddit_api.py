@@ -6,5 +6,6 @@ import pathlib
 CONFIG_FILE = pathlib.Path('./praw.ini')
 
 reddit = praw.Reddit(
-    site_name='bot'
+    site_name='bot',
+    
 )
