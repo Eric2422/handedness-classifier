@@ -10,5 +10,5 @@ Then fill in the empty fields with the necessary information.
 
 ## `/search`
 
-The [`/search`](.search) directory contains CSV files,
-each one storing subreddits to search through and the keywords to use for the search.
+The [`/search`](.search) directory contains CSV files.
+The first row stores subreddits to search through, and the second row stores keywords to use for the search.
