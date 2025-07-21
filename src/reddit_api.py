@@ -1,9 +1,12 @@
 import configparser
 import csv
 import sys
-import time
 
 import praw
+import requests
+
+SUBREDDITS = None
+KEYWORDS = None
 
 try:
     file_name = sys.argv[1]
@@ -23,7 +26,7 @@ except IndexError:
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./praw.ini')
 
-REDDIT = praw.Reddit(
+reddit = praw.Reddit(
     client_id=CONFIG['DEFAULT']['client_id'],
     client_secret=CONFIG['DEFAULT']['client_secret'],
     password=CONFIG['DEFAULT']['password'],
@@ -31,15 +34,19 @@ REDDIT = praw.Reddit(
     username=CONFIG['DEFAULT']['username'],
 )
 
-(REDDIT.subreddit(subreddit).search() for subreddit in SUBREDDITS)
+# search_results = [[reddit.subreddit(subreddit).search(keyword) for keyword in KEYWORDS] for subreddit in SUBREDDITS]
+# print(search_results)
+
 for subreddit_name in SUBREDDITS:
-    subreddit = REDDIT.subreddit(subreddit_name)
+    subreddit = reddit.subreddit(subreddit_name)
     print(f'\n\n\n-----{subreddit.display_name.upper()}-----', end='\n\n\n')
 
     for keyword in KEYWORDS:
         print(f'---{keyword.title()}---')
         for search_result in subreddit.search(keyword):
             print(f'\t{search_result.title}')
+            
+            print(f'{search_result.url}')
 
         print()
 
