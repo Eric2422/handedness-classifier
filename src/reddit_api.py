@@ -3,9 +3,14 @@ import csv
 import sys
 
 import praw
+import requests
 
-SUBREDDITS = []
-KEYWORDS = []
+SUBREDDITS = tuple()
+"""List of subreddits to search through."""
+KEYWORDS = tuple()
+"""List of key words to search with."""
+IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
+"""List of image file extensions that will be saved."""
 
 try:
     file_name = sys.argv[1]
@@ -13,40 +18,35 @@ try:
         csv = csv.reader(csv_file)
 
         SUBREDDITS = csv.__next__()
-        """List of subreddits to search through."""
-
         KEYWORDS = csv.__next__()
-        """List of key words to search with."""
-
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read('./praw.ini')
+config = configparser.ConfigParser()
+config.read('./praw.ini')
 
 reddit = praw.Reddit(
-    client_id=CONFIG['DEFAULT']['client_id'],
-    client_secret=CONFIG['DEFAULT']['client_secret'],
-    password=CONFIG['DEFAULT']['password'],
-    user_agent=CONFIG['DEFAULT']['user_agent'],
-    username=CONFIG['DEFAULT']['username'],
+    client_id=config['DEFAULT']['client_id'],
+    client_secret=config['DEFAULT']['client_secret'],
+    password=config['DEFAULT']['password'],
+    user_agent=config['DEFAULT']['user_agent'],
+    username=config['DEFAULT']['username'],
 )
-
-# search_results = [[reddit.subreddit(subreddit).search(keyword) for keyword in KEYWORDS] for subreddit in SUBREDDITS]
-# print(search_results)
 
 for subreddit_name in SUBREDDITS:
     subreddit = reddit.subreddit(subreddit_name)
-    print(f'\n\n\n-----{subreddit.display_name.upper()}-----', end='\n\n\n')
+    print(f'\n\n-----{subreddit.display_name.upper()}-----\n\n')
 
     for keyword in KEYWORDS:
         print(f'---{keyword.title()}---')
         for search_result in subreddit.search(keyword):
-            print(f'\t{search_result.title}')
-            
-            print(f'{search_result.url}')
+            # print(f'\t{search_result.title}')
+
+            url = search_result.url
+            if url.endswith(IMAGE_FORMATS):
+                print(url)
 
         print()
 
-    print(end='\n\n')
+    print('\n')
