@@ -3,10 +3,9 @@ import csv
 import sys
 
 import praw
-import requests
 
-SUBREDDITS = None
-KEYWORDS = None
+SUBREDDITS = []
+KEYWORDS = []
 
 try:
     file_name = sys.argv[1]
@@ -21,7 +20,7 @@ try:
 
 
 except IndexError:
-    print('You need to pass in the name of the file containg the subreddits and search keywords.')
+    print('You need to pass in the name of the file containing the subreddits and search keywords.')
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./praw.ini')
