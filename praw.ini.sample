@@ -28,5 +28,5 @@ timeout=16
 client_id=
 client_secret=
 password=
-user_aent=
+user_agent=
 username=
