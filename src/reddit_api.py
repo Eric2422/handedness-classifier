@@ -26,9 +26,11 @@ try:
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
 
+# Retrieve the subreddits and keywords to search for
 config = configparser.ConfigParser()
 config.read('./praw.ini')
 
+# Log into reddit
 reddit = praw.Reddit(
     client_id=config['DEFAULT']['client_id'],
     client_secret=config['DEFAULT']['client_secret'],
@@ -37,21 +39,27 @@ reddit = praw.Reddit(
     username=config['DEFAULT']['username'],
 )
 
+# Search each given subreddit
 for subreddit_name in SUBREDDITS:
     subreddit = reddit.subreddit(subreddit_name)
     print(f'----{subreddit.display_name.upper()}-----\n\n')
-
+    
+    # Search for each given keyword
     for keyword in KEYWORDS:
         print(f'---{keyword.title()}---')
         for search_result in subreddit.search(keyword):
 
             url = search_result.url
+            # Filter for images
             if url.endswith(IMAGE_FORMATS):
                 request = requests.get(url)
 
+                # Read image
                 try:
                     image = PIL.Image.open(io.BytesIO(request.content))
 
+                # Most failures seem to from imgur,
+                # with an error of "429: Too Many Requests"
                 except PIL.UnidentifiedImageError:
                     print(f'Image failed to open: {url}')
                     print(f'Err {request.status_code}: {http.client.responses[request.status_code]}')
