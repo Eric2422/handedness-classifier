@@ -10,7 +10,7 @@ import requests
 
 
 def read_image_from_url(url: str) -> PIL.Image.Image:
-    """_summary_
+    """Reads an image from a URL.
 
     Parameters
     ----------
