@@ -47,8 +47,7 @@ KEYWORDS = tuple()
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """List of image file extensions that will be saved."""
-
-IMG_DIRECTORY = pathlib.Path('img')
+IMAGE_DIRECTORY = pathlib.Path('img')
 """The directory that all images are saved to."""
 
 try:
@@ -56,8 +55,8 @@ try:
     with open(file_name) as csv_file:
         csv = csv.reader(csv_file)
 
-        SUBREDDITS = csv.__next__()
-        KEYWORDS = csv.__next__()
+        SUBREDDITS = [entry.strip() for entry in csv.__next__()]
+        KEYWORDS = [entry.strip().lower() for entry in csv.__next__()]
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
@@ -90,7 +89,7 @@ for subreddit_name in SUBREDDITS:
             if url.endswith(IMAGE_FORMATS):
                 try:
                     image = read_image_from_url(url)
-                    image.save(IMG_DIRECTORY / keyword.replace(' ', '_') /
+                    image.save(IMAGE_DIRECTORY / keyword.replace(' ', '_') /
                                pathlib.Path(url).name)
                     print()
 
