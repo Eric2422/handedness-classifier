@@ -94,9 +94,3 @@ for subreddit_name in SUBREDDITS:
 
                 except Exception as err:
                     print(err)
-
-        print()
-
-    print()
-
-print()
