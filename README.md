@@ -2,6 +2,15 @@
 
 A small computer vision program to try and distinguish left- and right-handed handwriting.
 
+## Random Forest
+
+[`random_forest.py`](./src/random_forest.py) trains a random forest model based on the images in [`img/left_hand`](./img/left_hand/) and [`img/right_hand`](./img/right_hand/).
+Caches the result into the [`cache/`](./cache/) directory.
+
+### Cache
+
+Stores previously trained models.
+
 ## Reddit Scraper
 
 The [Reddit scraper](./src/reddit_scraper.py) helps you gather images to train the models.
