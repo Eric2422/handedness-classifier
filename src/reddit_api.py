@@ -1,6 +1,7 @@
 import configparser
 import csv
 import sys
+import pathlib
 
 import http.client
 import io
@@ -26,7 +27,7 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
     ------
     ConnectionError
         The image could not be read from the URL.
-    """    
+    """
     request = requests.get(url)
 
     # Read image
@@ -35,14 +36,20 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
 
     # Most failures seem to be from imgur, with an error of "429: Too Many Requests"
     except PIL.UnidentifiedImageError:
-        raise ConnectionError(f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
+        raise ConnectionError(
+            f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
+
 
 SUBREDDITS = tuple()
 """List of subreddits to search through."""
 KEYWORDS = tuple()
 """List of key words to search with."""
+
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """List of image file extensions that will be saved."""
+
+IMG_DIRECTORY = pathlib.Path('img')
+"""The directory that all images are saved to."""
 
 try:
     file_name = sys.argv[1]
@@ -77,13 +84,16 @@ for subreddit_name in SUBREDDITS:
     for keyword in KEYWORDS:
         print(f'---{keyword.title()}---')
         for search_result in subreddit.search(keyword):
-
             url = search_result.url
-            # Filter for images
+
+            # Filter search results for images
             if url.endswith(IMAGE_FORMATS):
                 try:
                     image = read_image_from_url(url)
-                
+                    image.save(IMG_DIRECTORY / keyword.replace(' ', '_') /
+                               pathlib.Path(url).name)
+                    print()
+
                 except Exception as err:
                     print(err)
 
