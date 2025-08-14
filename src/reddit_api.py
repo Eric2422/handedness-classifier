@@ -90,7 +90,7 @@ for subreddit_name in SUBREDDITS:
                 try:
                     image = read_image_from_url(url)
                     image.save(IMAGE_DIRECTORY / keyword.replace(' ', '_') /
-                               pathlib.Path(url).name)
+                               search_result.title.replace('', '_'))
 
                 except Exception as err:
                     print(err)
