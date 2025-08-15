@@ -47,7 +47,7 @@ KEYWORDS = tuple()
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """List of image file extensions that will be saved."""
-IMAGE_DIRECTORY = pathlib.Path('img')
+SCRAPER_DIRECTORY = pathlib.Path('.img/scraper')
 """The directory that all images are saved to."""
 
 try:
@@ -89,8 +89,7 @@ for subreddit_name in SUBREDDITS:
             if url.endswith(IMAGE_FORMATS):
                 try:
                     image = read_image_from_url(url)
-                    image.save(IMAGE_DIRECTORY / keyword.replace(' ', '_') /
-                               search_result.title.replace('', '_'))
+                    image.save(SCRAPER_DIRECTORY / pathlib.Path(url).name)
 
                 except Exception as err:
                     print(err)
