@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 
 import joblib
 import natsort
@@ -20,6 +21,19 @@ IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 MODEL_DIRECTORY = pathlib.Path('./cache')
 memory = joblib.Memory(MODEL_DIRECTORY)
 
+TEST_DATA_PROPORTION: float
+"""
+    The proportion of total data that will be used for testing,
+    e.g., if the value is `0.2`, 
+    then 20% of the data will be used for testing.
+"""
+
+try:
+    TEST_DATA_PROPORTION = int(sys.argv[1])
+
+except:
+    TEST_DATA_PROPORTION = 0.2
+
 # Get all the images of left-handed writing
 left_files = [file for file in natsort.natsorted(os.listdir(
     LEFT_DIRECTORY)) if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS]
@@ -36,7 +50,7 @@ y_data = [0] * len(left_images) + [1] * len(right_images)
 
 # Split the data into training and testing data.
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(
-    x_data, y_data, test_size=0.2
+    x_data, y_data, test_size=TEST_DATA_PROPORTION
 )
 
 clf = sklearn.ensemble.RandomForestClassifier()
