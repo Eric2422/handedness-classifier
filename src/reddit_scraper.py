@@ -47,7 +47,7 @@ KEYWORDS = tuple()
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """List of image file extensions that will be saved."""
-SCRAPER_DIRECTORY = pathlib.Path('.img/scraper')
+SCRAPER_DIRECTORY = pathlib.Path('./img/scraper')
 """The directory that all images are saved to."""
 
 try:
