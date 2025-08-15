@@ -31,4 +31,4 @@ The first row stores subreddits to search through, and the second row stores key
 
 ### [`img/scraper`](./img/scraper)
 
-The [`img/scraper`](./img/scraper) directory stores the files that the Reddit scraper finds.
+The [`img/scraper`](./img/scraper) directory stores the images that the Reddit scraper finds.
