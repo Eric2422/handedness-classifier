@@ -77,11 +77,11 @@ reddit = praw.Reddit(
 # Search each given subreddit
 for subreddit_name in SUBREDDITS:
     subreddit = reddit.subreddit(subreddit_name)
-    print(f'----{subreddit.display_name.upper()}-----\n\n')
+    print(f'-----r/{subreddit.display_name}-----\n\n')
 
     # Search for each given keyword
     for keyword in KEYWORDS:
-        print(f'---{keyword.title()}---')
+        print(f'---Searching for "{keyword}"---')
         for search_result in subreddit.search(keyword):
             url = search_result.url
 
@@ -90,6 +90,11 @@ for subreddit_name in SUBREDDITS:
                 try:
                     image = read_image_from_url(url)
                     image.save(SCRAPER_DIRECTORY / pathlib.Path(url).name)
+                    print(f'Image successfully downloaded: {url}')
 
                 except Exception as err:
+                    print()
                     print(err)
+                    print()
+                
+        print()
