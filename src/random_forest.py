@@ -34,6 +34,7 @@ right_images = [ski.io.imread(RIGHT_DIRECTORY / file) for file in right_files]
 x_data = [img for img in left_images + right_images]
 y_data = [0] * len(left_images) + [1] * len(right_images)
 
+# Split the data into training and testing data.
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(
     x_data, y_data, test_size=0.2
 )
