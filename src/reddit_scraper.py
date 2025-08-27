@@ -5,6 +5,7 @@ import pathlib
 
 import http.client
 import io
+import json
 import PIL.Image
 import praw
 import requests
@@ -62,7 +63,7 @@ try:
 
         # Save the keywords to search for.
         for entry in csv.__next__():
-            keywords = [entry.strip().lower() for entry in csv.__next__()]
+            keywords.append(entry.strip().lower())
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
@@ -80,6 +81,8 @@ reddit = praw.Reddit(
     username=config['DEFAULT']['username'],
 )
 
+search_results: dict[str, dict[str, dict[str, str]]] = dict()
+
 # Search each given subreddit.
 for subreddit_name in subreddits:
     subreddit = reddit.subreddit(subreddit_name)
@@ -90,6 +93,8 @@ for subreddit_name in subreddits:
     subreddit_directory = SCRAPER_DIRECTORY / str(subreddit)
     if not subreddit_directory.is_dir():
         subreddit_directory.mkdir()
+
+    subreddit_dict = dict()
 
     # Search for each given keyword.
     for keyword in keywords:
@@ -102,6 +107,8 @@ for subreddit_name in subreddits:
         if not keyword_directory.is_dir():
             keyword_directory.mkdir()
 
+        keyword_dict = dict()
+
         for search_result in subreddit.search(keyword):
             url = search_result.url
 
@@ -111,7 +118,7 @@ for subreddit_name in subreddits:
                     # Save the image.
                     image = read_image_from_url(url)
                     image.save(
-                        keyword_directory / pathlib.Path(url).name
+                        keyword_directory / pathlib.Path(url).name,
                     )
                     print(f'Image successfully downloaded: {url}')
 
@@ -120,6 +127,10 @@ for subreddit_name in subreddits:
                     print(err)
                     print()
 
+            keyword_dict[url] = {'title': search_result.title, 'body': search_result.selftext}
             index += 1
 
+        subreddit_dict[keyword] = keyword_dict
         print()
+
+    search_results[subreddit_name] = subreddit_dict
