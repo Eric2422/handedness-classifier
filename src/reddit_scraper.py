@@ -40,23 +40,26 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
             f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
 
 
-SUBREDDITS = tuple()
-"""List of subreddits to search through."""
-KEYWORDS = tuple()
-"""List of key words to search with."""
-
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """List of image file extensions that will be saved."""
 SCRAPER_DIRECTORY = pathlib.Path('./img/scraper')
 """The directory that all images are saved to."""
+
+subreddits: list[str] = list()
+"""List of subreddits to search through."""
+keywords: list[str] = list()
+"""List of key words to search with."""
 
 try:
     file_name = sys.argv[1]
     with open(file_name) as csv_file:
         csv = csv.reader(csv_file)
 
-        SUBREDDITS = [entry.strip() for entry in csv.__next__()]
-        KEYWORDS = [entry.strip().lower() for entry in csv.__next__()]
+        for entry in csv.__next__():
+            subreddits.append(entry.strip())
+
+        for entry in csv.__next__():
+            keywords = [entry.strip().lower() for entry in csv.__next__()]
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
@@ -75,7 +78,7 @@ reddit = praw.Reddit(
 )
 
 # Search each given subreddit
-for subreddit_name in SUBREDDITS:
+for subreddit_name in subreddits:
     subreddit = reddit.subreddit(subreddit_name)
     print(f'-----r/{subreddit.display_name}-----\n\n')
 
@@ -86,7 +89,7 @@ for subreddit_name in SUBREDDITS:
         subreddit_directory.mkdir()
 
     # Search for each given keyword
-    for keyword in KEYWORDS:
+    for keyword in keywords:
         index = 0
         print(f'---Searching for "{keyword}"---')
 
@@ -114,4 +117,5 @@ for subreddit_name in SUBREDDITS:
                     print()
 
             index += 1
+
         print()
