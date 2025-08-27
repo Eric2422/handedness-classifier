@@ -79,10 +79,22 @@ for subreddit_name in SUBREDDITS:
     subreddit = reddit.subreddit(subreddit_name)
     print(f'-----r/{subreddit.display_name}-----\n\n')
 
+    # If there is not a directory in `SCRAPER_DIRECTORY` for the subreddit,
+    # create it.
+    subreddit_directory = SCRAPER_DIRECTORY / str(subreddit)
+    if not subreddit_directory.is_dir():
+        subreddit_directory.mkdir()
+
     # Search for each given keyword
     for keyword in KEYWORDS:
         index = 0
         print(f'---Searching for "{keyword}"---')
+
+        # If there is not a directory in `subreddit_directory` for the keyword,
+        # create it.
+        keyword_directory = subreddit_directory / keyword
+        if not keyword_directory.is_dir():
+            keyword_directory.mkdir()
 
         for search_result in subreddit.search(keyword):
             url = search_result.url
@@ -91,13 +103,15 @@ for subreddit_name in SUBREDDITS:
             if url.endswith(IMAGE_FORMATS):
                 try:
                     image = read_image_from_url(url)
-                    image.save(SCRAPER_DIRECTORY / str(subreddit) / f'{keyword}{index}{pathlib.Path(url).suffix}')
+                    image.save(
+                        keyword_directory / pathlib.Path(url).name
+                    )
                     print(f'Image successfully downloaded: {url}')
 
                 except Exception as err:
                     print()
                     print(err)
                     print()
-                
-        index += 1
+
+            index += 1
         print()
