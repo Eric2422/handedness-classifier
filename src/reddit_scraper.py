@@ -41,34 +41,37 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
 
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
-"""List of image file extensions that will be saved."""
+"""The list of image file extensions that will be saved."""
 SCRAPER_DIRECTORY = pathlib.Path('./img/scraper')
 """The directory that all images are saved to."""
 
 subreddits: list[str] = list()
-"""List of subreddits to search through."""
+"""The list of subreddits to search through."""
 keywords: list[str] = list()
-"""List of key words to search with."""
+"""The list of keywords to search for."""
 
 try:
+    # Open the input file provided by the user.
     file_name = sys.argv[1]
     with open(file_name) as csv_file:
         csv = csv.reader(csv_file)
 
+        # Save the subreddits to search through.
         for entry in csv.__next__():
             subreddits.append(entry.strip())
 
+        # Save the keywords to search for.
         for entry in csv.__next__():
             keywords = [entry.strip().lower() for entry in csv.__next__()]
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
 
-# Retrieve the subreddits and keywords to search for
+# Retrieve the subreddits and keywords to search for.
 config = configparser.ConfigParser()
 config.read('./praw.ini')
 
-# Log into reddit
+# Log into reddit.
 reddit = praw.Reddit(
     client_id=config['DEFAULT']['client_id'],
     client_secret=config['DEFAULT']['client_secret'],
@@ -77,7 +80,7 @@ reddit = praw.Reddit(
     username=config['DEFAULT']['username'],
 )
 
-# Search each given subreddit
+# Search each given subreddit.
 for subreddit_name in subreddits:
     subreddit = reddit.subreddit(subreddit_name)
     print(f'-----r/{subreddit.display_name}-----\n\n')
@@ -88,7 +91,7 @@ for subreddit_name in subreddits:
     if not subreddit_directory.is_dir():
         subreddit_directory.mkdir()
 
-    # Search for each given keyword
+    # Search for each given keyword.
     for keyword in keywords:
         index = 0
         print(f'---Searching for "{keyword}"---')
@@ -102,9 +105,10 @@ for subreddit_name in subreddits:
         for search_result in subreddit.search(keyword):
             url = search_result.url
 
-            # Filter search results for images
+            # Filter search results for images.
             if url.endswith(IMAGE_FORMATS):
                 try:
+                    # Save the image.
                     image = read_image_from_url(url)
                     image.save(
                         keyword_directory / pathlib.Path(url).name
