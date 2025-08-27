@@ -81,7 +81,9 @@ for subreddit_name in SUBREDDITS:
 
     # Search for each given keyword
     for keyword in KEYWORDS:
+        index = 0
         print(f'---Searching for "{keyword}"---')
+
         for search_result in subreddit.search(keyword):
             url = search_result.url
 
@@ -89,7 +91,7 @@ for subreddit_name in SUBREDDITS:
             if url.endswith(IMAGE_FORMATS):
                 try:
                     image = read_image_from_url(url)
-                    image.save(SCRAPER_DIRECTORY / pathlib.Path(url).name)
+                    image.save(SCRAPER_DIRECTORY / str(subreddit) / f'{keyword}{index}{pathlib.Path(url).suffix}')
                     print(f'Image successfully downloaded: {url}')
 
                 except Exception as err:
@@ -97,4 +99,5 @@ for subreddit_name in SUBREDDITS:
                     print(err)
                     print()
                 
+        index += 1
         print()
