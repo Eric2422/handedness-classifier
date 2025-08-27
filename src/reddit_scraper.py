@@ -114,23 +114,32 @@ for subreddit_name in subreddits:
 
             # Filter search results for images.
             if url.endswith(IMAGE_FORMATS):
-                try:
-                    # Save the image.
+                try:                    
                     image = read_image_from_url(url)
+                    
+                    # Save the image.
+
+                    filepath = keyword_directory / pathlib.Path(url).name
                     image.save(
-                        keyword_directory / pathlib.Path(url).name,
+                        filepath
                     )
                     print(f'Image successfully downloaded: {url}')
+
+                    keyword_dict[filepath] = {
+                        'title': search_result.title,
+                        'url': url
+                    }
+                    index += 1
 
                 except Exception as err:
                     print()
                     print(err)
                     print()
 
-            keyword_dict[url] = {'title': search_result.title, 'body': search_result.selftext}
-            index += 1
-
         subreddit_dict[keyword] = keyword_dict
         print()
 
     search_results[subreddit_name] = subreddit_dict
+
+with open('img/scraper/search-results.json', 'w', encoding='utf-8') as file:
+    json.dump(search_results, file, ensure_ascii=False, indent=4)
