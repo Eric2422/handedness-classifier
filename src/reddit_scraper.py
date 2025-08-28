@@ -155,7 +155,7 @@ for subreddit_name in subreddits:
         )
 
         # If there is not a directory in `subreddit_directory` for the keyword, create it.
-        keyword_directory = subreddit_directory / keyword
+        keyword_directory = subreddit_directory / keyword.replace(' ', '-')
         if not keyword_directory.is_dir():
             keyword_directory.mkdir()
 
