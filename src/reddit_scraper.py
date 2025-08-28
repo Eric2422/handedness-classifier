@@ -5,6 +5,7 @@ import pathlib
 
 import http.client
 import io
+import json
 import PIL.Image
 import praw
 import requests
@@ -40,32 +41,38 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
             f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
 
 
-SUBREDDITS = tuple()
-"""List of subreddits to search through."""
-KEYWORDS = tuple()
-"""List of key words to search with."""
-
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
-"""List of image file extensions that will be saved."""
+"""The list of image file extensions that will be saved."""
 SCRAPER_DIRECTORY = pathlib.Path('./img/scraper')
 """The directory that all images are saved to."""
 
+subreddits: list[str] = list()
+"""The list of subreddits to search through."""
+keywords: list[str] = list()
+"""The list of keywords to search for."""
+
 try:
+    # Open the input file provided by the user.
     file_name = sys.argv[1]
     with open(file_name) as csv_file:
         csv = csv.reader(csv_file)
 
-        SUBREDDITS = [entry.strip() for entry in csv.__next__()]
-        KEYWORDS = [entry.strip().lower() for entry in csv.__next__()]
+        # Save the subreddits to search through.
+        for entry in csv.__next__():
+            subreddits.append(entry.strip())
+
+        # Save the keywords to search for.
+        for entry in csv.__next__():
+            keywords.append(entry.strip().lower())
 
 except IndexError:
     print('You need to pass in the name of the file containing the subreddits and search keywords.')
 
-# Retrieve the subreddits and keywords to search for
+# Retrieve the subreddits and keywords to search for.
 config = configparser.ConfigParser()
 config.read('./praw.ini')
 
-# Log into reddit
+# Log into reddit.
 reddit = praw.Reddit(
     client_id=config['DEFAULT']['client_id'],
     client_secret=config['DEFAULT']['client_secret'],
@@ -74,30 +81,65 @@ reddit = praw.Reddit(
     username=config['DEFAULT']['username'],
 )
 
-# Search each given subreddit
-for subreddit_name in SUBREDDITS:
+search_results: dict[str, dict[str, dict[str, str]]] = dict()
+
+# Search each given subreddit.
+for subreddit_name in subreddits:
     subreddit = reddit.subreddit(subreddit_name)
     print(f'-----r/{subreddit.display_name}-----\n\n')
 
-    # Search for each given keyword
-    for keyword in KEYWORDS:
+    # If there is not a directory in `SCRAPER_DIRECTORY` for the subreddit,
+    # create it.
+    subreddit_directory = SCRAPER_DIRECTORY / str(subreddit)
+    if not subreddit_directory.is_dir():
+        subreddit_directory.mkdir()
+
+    subreddit_dict = dict()
+
+    # Search for each given keyword.
+    for keyword in keywords:
         index = 0
         print(f'---Searching for "{keyword}"---')
+
+        # If there is not a directory in `subreddit_directory` for the keyword,
+        # create it.
+        keyword_directory = subreddit_directory / keyword
+        if not keyword_directory.is_dir():
+            keyword_directory.mkdir()
+
+        keyword_dict = dict()
 
         for search_result in subreddit.search(keyword):
             url = search_result.url
 
-            # Filter search results for images
+            # Filter search results for images.
             if url.endswith(IMAGE_FORMATS):
-                try:
+                try:                    
                     image = read_image_from_url(url)
-                    image.save(SCRAPER_DIRECTORY / str(subreddit) / f'{keyword}{index}{pathlib.Path(url).suffix}')
+                    
+                    # Save the image.
+
+                    filepath = keyword_directory / pathlib.Path(url).name
+                    image.save(
+                        filepath
+                    )
                     print(f'Image successfully downloaded: {url}')
+
+                    keyword_dict[filepath.as_posix()] = {
+                        'title': search_result.title,
+                        'url': url
+                    }
+                    index += 1
 
                 except Exception as err:
                     print()
                     print(err)
                     print()
-                
-        index += 1
+
+        subreddit_dict[keyword] = keyword_dict
         print()
+
+    search_results[subreddit_name] = subreddit_dict
+
+with open('img/scraper/search-results.json', 'w', encoding='utf-8') as file:
+    json.dump(search_results, file, ensure_ascii=False, indent=4)
