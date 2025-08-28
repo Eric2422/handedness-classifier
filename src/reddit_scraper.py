@@ -98,7 +98,6 @@ for subreddit_name in subreddits:
 
     # Search for each given keyword.
     for keyword in keywords:
-        index = 0
         print(f'---Searching for "{keyword}"---')
 
         # If there is not a directory in `subreddit_directory` for the keyword,
@@ -118,18 +117,16 @@ for subreddit_name in subreddits:
                     image = read_image_from_url(url)
                     
                     # Save the image.
-
                     filepath = keyword_directory / pathlib.Path(url).name
                     image.save(
                         filepath
                     )
-                    print(f'Image successfully downloaded: {url}')
 
                     keyword_dict[filepath.as_posix()] = {
                         'title': search_result.title,
                         'url': url
                     }
-                    index += 1
+                    print(f'Image successfully downloaded: {url}')
 
                 except Exception as err:
                     print()
