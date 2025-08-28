@@ -125,7 +125,7 @@ for subreddit_name in subreddits:
                     )
                     print(f'Image successfully downloaded: {url}')
 
-                    keyword_dict[filepath] = {
+                    keyword_dict[filepath.as_posix()] = {
                         'title': search_result.title,
                         'url': url
                     }
