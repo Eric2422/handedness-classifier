@@ -35,13 +35,17 @@ except:
     TEST_DATA_PROPORTION = 0.2
 
 # Get all the images of left-handed writing
-left_files = [file for file in natsort.natsorted(os.listdir(
-    LEFT_DIRECTORY)) if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS]
+left_files = [
+    file for file in natsort.natsorted(os.listdir(LEFT_DIRECTORY))
+    if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
+]
 left_images = [ski.io.imread(LEFT_DIRECTORY / file) for file in left_files]
 
 # Get all images of right-handed writing
-right_files = [file for file in natsort.natsorted(os.listdir(
-    RIGHT_DIRECTORY)) if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS]
+right_files = [
+    file for file in natsort.natsorted(os.listdir(RIGHT_DIRECTORY))
+    if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
+]
 right_images = [ski.io.imread(RIGHT_DIRECTORY / file) for file in right_files]
 
 # Combine the data into a single array
