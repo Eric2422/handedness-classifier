@@ -38,17 +38,12 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
     # Most failures seem to be from imgur, with an error of "429: Too Many Requests"
     except PIL.UnidentifiedImageError:
         raise ConnectionError(
-            f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
+            f'Failed to open image: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
 
 
 def search_subreddit_for_keyword(subreddit, keyword):
+    images: dict[str, PIL.Image.Image] = dict()
     keyword_dict: dict[str, dict[str, str]] = dict()
-
-    # If there is not a directory in `subreddit_directory` for the keyword,
-    # create it.
-    keyword_directory = subreddit_directory / keyword
-    if not keyword_directory.is_dir():
-        keyword_directory.mkdir()
 
     for search_result in subreddit.search(keyword):
         url = search_result.url
@@ -56,26 +51,20 @@ def search_subreddit_for_keyword(subreddit, keyword):
         # Filter search results for images.
         if url.endswith(IMAGE_FORMATS):
             try:
-                image = read_image_from_url(url)
+                file_name = pathlib.Path(url).name
+                images[file_name] = read_image_from_url(url)
 
-                # Save the image.
-                filepath = keyword_directory / pathlib.Path(url).name
-                image.save(
-                    filepath
-                )
-
-                keyword_dict[filepath.as_posix()] = {
+                keyword_dict[file_name] = {
                     'title': search_result.title,
                     'url': url
                 }
-                print(f'Image successfully downloaded: {url}')
 
             except Exception as err:
                 print()
                 print(err)
                 print()
 
-    return keyword_dict
+    return images, keyword_dict
 
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
@@ -137,7 +126,25 @@ for subreddit_name in subreddits:
     for keyword in keywords:
         print(f'---Searching for "{keyword}"---')
 
-        subreddit_dict[keyword] = search_subreddit_for_keyword(subreddit, keyword)
+        images, subreddit_dict[keyword] = search_subreddit_for_keyword(
+            subreddit, keyword
+        )
+
+        # If there is not a directory in `subreddit_directory` for the keyword, create it.
+        keyword_directory = subreddit_directory / keyword
+        if not keyword_directory.is_dir():
+            keyword_directory.mkdir()
+
+        for file_name, image in images.items():
+            try:
+                image.save(keyword_directory / file_name)
+                print(f'Successfully saved image: {file_name}')
+
+            except:
+                print()
+                print(f'Failed to save image: {file_name}')
+                print()
+
         print()
 
     search_results[subreddit_name] = subreddit_dict
