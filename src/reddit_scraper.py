@@ -62,7 +62,7 @@ def search_subreddit_for_images(
     -------
     tuple[ dict[str, PIL.Image.Image], dict[str, dict[str, str]] ]
         A dictionary with filenames and associated images
-        and another dictionary containing information about the posts that the images were extracted from.
+        and a sorted dictionary containing information about the posts that the images were extracted from.
     """
     images: dict[str, PIL.Image.Image] = dict()
     keyword_dict: dict[str, dict[str, str]] = dict()
@@ -88,7 +88,7 @@ def search_subreddit_for_images(
                 print(err)
                 print()
 
-    return images, keyword_dict
+    return images, dict(sorted(keyword_dict.items()))
 
 
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
