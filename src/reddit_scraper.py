@@ -8,6 +8,7 @@ import io
 import json
 import PIL.Image
 import praw
+import praw.models
 import requests
 
 
@@ -41,7 +42,28 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
             f'Failed to open image: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
 
 
-def search_subreddit_for_keyword(subreddit, keyword):
+def search_subreddit_for_images(
+        subreddit: praw.models.Subreddit,
+        keyword: str
+) -> tuple[
+    dict[str, PIL.Image.Image],
+    dict[str, dict[str, str]]
+]:
+    """Given a subreddit and a keyword, search the subreddit for images.
+
+    Parameters
+    ----------
+    subreddit : praw.models.Subreddit
+        The subreddit to search for images.
+    keyword : str
+        The keyword(s) to search for.
+
+    Returns
+    -------
+    tuple[ dict[str, PIL.Image.Image], dict[str, dict[str, str]] ]
+        A dictionary with filenames and associated images
+        and another dictionary containing information about the posts that the images were extracted from.
+    """
     images: dict[str, PIL.Image.Image] = dict()
     keyword_dict: dict[str, dict[str, str]] = dict()
 
@@ -54,6 +76,7 @@ def search_subreddit_for_keyword(subreddit, keyword):
                 file_name = pathlib.Path(url).name
                 images[file_name] = read_image_from_url(url)
 
+                # Record information about the post that the image came from.
                 keyword_dict[file_name] = {
                     'title': search_result.title,
                     'url': url
@@ -126,7 +149,7 @@ for subreddit_name in subreddits:
     for keyword in keywords:
         print(f'---Searching for "{keyword}"---')
 
-        images, subreddit_dict[keyword] = search_subreddit_for_keyword(
+        images, subreddit_dict[keyword] = search_subreddit_for_images(
             subreddit, keyword
         )
 
