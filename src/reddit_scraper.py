@@ -136,7 +136,7 @@ search_results: dict[str, dict[str, dict[str, str]]] = dict()
 # Search each given subreddit.
 for subreddit_name in subreddits:
     subreddit = reddit.subreddit(subreddit_name)
-    print(f'-----r/{subreddit.display_name}-----\n\n')
+    print(f'----- r/{subreddit.display_name} -----\n\n')
 
     # If there is not a directory in `SCRAPER_DIRECTORY` for the subreddit,
     # create it.
@@ -148,7 +148,7 @@ for subreddit_name in subreddits:
 
     # Search for each given keyword.
     for keyword in keywords:
-        print(f'---Searching for "{keyword}"---')
+        print(f'--- Searching for "{keyword}" ---')
 
         images, subreddit_dict[keyword] = search_subreddit_for_images(
             subreddit, keyword
