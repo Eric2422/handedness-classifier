@@ -79,7 +79,8 @@ def search_subreddit_for_images(
                 # Record information about the post that the image came from.
                 keyword_dict[file_name] = {
                     'title': search_result.title,
-                    'url': url
+                    'body': search_result.selftext,
+                    'url': url,
                 }
 
             except Exception as err:
