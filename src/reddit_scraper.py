@@ -41,6 +41,43 @@ def read_image_from_url(url: str) -> PIL.Image.Image:
             f'Image failed to open: {url} \nError {request.status_code}: {http.client.responses[request.status_code]}')
 
 
+def search_subreddit_for_keyword(subreddit, keyword):
+    keyword_dict: dict[str, dict[str, str]] = dict()
+
+    # If there is not a directory in `subreddit_directory` for the keyword,
+    # create it.
+    keyword_directory = subreddit_directory / keyword
+    if not keyword_directory.is_dir():
+        keyword_directory.mkdir()
+
+    for search_result in subreddit.search(keyword):
+        url = search_result.url
+
+        # Filter search results for images.
+        if url.endswith(IMAGE_FORMATS):
+            try:
+                image = read_image_from_url(url)
+
+                # Save the image.
+                filepath = keyword_directory / pathlib.Path(url).name
+                image.save(
+                    filepath
+                )
+
+                keyword_dict[filepath.as_posix()] = {
+                    'title': search_result.title,
+                    'url': url
+                }
+                print(f'Image successfully downloaded: {url}')
+
+            except Exception as err:
+                print()
+                print(err)
+                print()
+
+    return keyword_dict
+
+
 IMAGE_FORMATS = ('jpg', 'jpeg', 'png')
 """The list of image file extensions that will be saved."""
 SCRAPER_DIRECTORY = pathlib.Path('./img/scraper')
@@ -100,40 +137,7 @@ for subreddit_name in subreddits:
     for keyword in keywords:
         print(f'---Searching for "{keyword}"---')
 
-        # If there is not a directory in `subreddit_directory` for the keyword,
-        # create it.
-        keyword_directory = subreddit_directory / keyword
-        if not keyword_directory.is_dir():
-            keyword_directory.mkdir()
-
-        keyword_dict = dict()
-
-        for search_result in subreddit.search(keyword):
-            url = search_result.url
-
-            # Filter search results for images.
-            if url.endswith(IMAGE_FORMATS):
-                try:                    
-                    image = read_image_from_url(url)
-                    
-                    # Save the image.
-                    filepath = keyword_directory / pathlib.Path(url).name
-                    image.save(
-                        filepath
-                    )
-
-                    keyword_dict[filepath.as_posix()] = {
-                        'title': search_result.title,
-                        'url': url
-                    }
-                    print(f'Image successfully downloaded: {url}')
-
-                except Exception as err:
-                    print()
-                    print(err)
-                    print()
-
-        subreddit_dict[keyword] = keyword_dict
+        subreddit_dict[keyword] = search_subreddit_for_keyword(subreddit, keyword)
         print()
 
     search_results[subreddit_name] = subreddit_dict
