@@ -3,10 +3,46 @@ import pathlib
 import sys
 
 import joblib
-import natsort
+import numpy as np
+import numpy.typing as npt
 import skimage as ski
 import sklearn.ensemble
 import sklearn.model_selection
+
+
+def read_image_directory(directory_path: str | pathlib.Path) -> npt.NDArray:
+    """Read a directory of images and return its contents.
+
+    Any images with file endings included in `IMAGE_FILE_EXTENSIONS` are accepted.
+
+    Parameters
+    ----------
+    directory_path : str | pathlib.Path
+        A string or `Path` object that points to a directory of images.
+
+    Returns
+    -------
+    npt.NDArray
+        The contents of the directory represented as a multi-dimensional NumPy array.
+    """
+    # Retrieve all the filepaths within the directory
+    filepaths = [
+        file for file in os.listdir(directory_path)
+        if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
+    ]
+
+    # For each filepath, read the file.
+    images = [
+        (
+            # If the filepath points to a PNG file, strip the PNG of its alpha value.
+            ski.io.imread(LEFT_DIRECTORY / file)[:, :, :-1] if file.endswith('.png')
+            else ski.io.imread(LEFT_DIRECTORY / file)
+        )
+        for file in filepaths
+    ]
+
+    return np.array(images)
+
 
 IMAGE_DIRECTORY = pathlib.Path('./img')
 """The directory that stores images of handwriting."""
@@ -42,18 +78,10 @@ except:
     TEST_DATA_PROPORTION = 0.2
 
 # Get all the images of left-handed writing
-left_files = [
-    file for file in natsort.natsorted(os.listdir(LEFT_DIRECTORY))
-    if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
-]
-left_images = [ski.io.imread(LEFT_DIRECTORY / file) for file in left_files]
+left_images = read_image_directory(LEFT_DIRECTORY)
 
 # Get all images of right-handed writing
-right_files = [
-    file for file in natsort.natsorted(os.listdir(RIGHT_DIRECTORY))
-    if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
-]
-right_images = [ski.io.imread(RIGHT_DIRECTORY / file) for file in right_files]
+right_images = read_image_directory(LEFT_DIRECTORY)
 
 # Combine the data into a single array
 x_data = [img for img in left_images + right_images]
