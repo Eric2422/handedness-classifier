@@ -21,17 +21,24 @@ IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 MODEL_DIRECTORY = pathlib.Path('./cache')
 memory = joblib.Memory(MODEL_DIRECTORY)
 
+VALIDATION_PROPORTION: float
+"""
+    The proportion of total data that will be used for validation,
+    e.g., if the value is `0.2`, 20% of the data will be used for validation.
+"""
+
 TEST_DATA_PROPORTION: float
 """
     The proportion of total data that will be used for testing,
-    e.g., if the value is `0.2`, 
-    then 20% of the data will be used for testing.
+    e.g., if the value is `0.2`, 20% of the data will be used for testing.
 """
 
 try:
-    TEST_DATA_PROPORTION = int(sys.argv[1])
+    VALIDATION_PROPORTION = float(sys.argv[1])
+    TEST_DATA_PROPORTION = float(sys.argv[2])
 
 except:
+    VALIDATION_PROPORTION = 0.1
     TEST_DATA_PROPORTION = 0.2
 
 # Get all the images of left-handed writing

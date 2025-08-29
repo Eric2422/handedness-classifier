@@ -8,7 +8,7 @@ A small computer vision program to try and distinguish left- and right-handed ha
 based on the images in [`img/left_hand`](./img/left_hand/) and [`img/right_hand`](./img/right_hand/).
 Then, the model attempts to classify the images in [`img/input`](./img/input/) into left hand or right hand.
 
-The program will default to splitting the data into training, validation and test with a ratio of 80:10:20.
+The program will default to splitting the data into training, validation and test with a ratio of 70:10:20.
 If you wish to use a different proportion of the data for testing, pass it in as a command-line arguments:
 `python src/random_forest.py <validation data proportion> <test data proportion>`,
 e.g., `python src/random_forest.py 0.15 0.25`.
