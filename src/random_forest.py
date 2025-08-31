@@ -1,58 +1,11 @@
-import os
 import pathlib
 import sys
 
 import joblib
-import numpy as np
-import numpy.typing as npt
-import skimage as ski
 import sklearn.ensemble
 import sklearn.model_selection
 
-
-def read_image_directory(directory_path: str | pathlib.Path) -> npt.NDArray:
-    """Read a directory of images and return its contents.
-
-    Any images with file endings included in `IMAGE_FILE_EXTENSIONS` are accepted.
-
-    Parameters
-    ----------
-    directory_path : str | pathlib.Path
-        A string or `Path` object that points to a directory of images.
-
-    Returns
-    -------
-    npt.NDArray
-        The contents of the directory represented as a multi-dimensional NumPy array.
-    """
-    # Retrieve all the filepaths within the directory
-    filepaths = [
-        file for file in os.listdir(directory_path)
-        if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
-    ]
-
-    # For each filepath, read the file.
-    images = [
-        (
-            # If the filepath points to a PNG file, strip the PNG of its alpha value.
-            ski.io.imread(LEFT_DIRECTORY / file)[:, :, :-1] if file.endswith('.png')
-            else ski.io.imread(LEFT_DIRECTORY / file)
-        )
-        for file in filepaths
-    ]
-
-    return np.array(images)
-
-
-IMAGE_DIRECTORY = pathlib.Path('./img')
-"""The directory that stores images of handwriting."""
-LEFT_DIRECTORY = IMAGE_DIRECTORY / 'left'
-"""The directory that stores images of left-handed writing."""
-RIGHT_DIRECTORY = IMAGE_DIRECTORY / 'right'
-"""The directory that stores images of right-handed writing."""
-
-IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
-"""List of accepted image file extensions."""
+import image_reader
 
 MODEL_DIRECTORY = pathlib.Path('./cache')
 memory = joblib.Memory(MODEL_DIRECTORY)
@@ -78,10 +31,10 @@ except:
     TEST_DATA_PROPORTION = 0.2
 
 # Get all the images of left-handed writing
-left_images = read_image_directory(LEFT_DIRECTORY)
+left_images = image_reader.read_image_directory(image_reader.LEFT_DIRECTORY)
 
 # Get all images of right-handed writing
-right_images = read_image_directory(LEFT_DIRECTORY)
+right_images = image_reader.read_image_directory(image_reader.RIGHT_DIRECTORY)
 
 # Combine the data into a single array
 x_data = [img for img in left_images + right_images]
