@@ -31,12 +31,14 @@ def read_image_directory(directory_path: str | pathlib.Path) -> npt.NDArray:
         if pathlib.Path(file).suffix.lower() in IMAGE_FILE_EXTENSIONS
     ]
 
+    directory = pathlib.Path(directory_path)
+
     # For each filepath, read the file.
     images = [
         (
             # If the filepath points to a PNG file, strip the PNG of its alpha value.
-            ski.io.imread(LEFT_DIRECTORY / file)[:, :, :-1] if file.endswith('.png')
-            else ski.io.imread(LEFT_DIRECTORY / file)
+            ski.io.imread(directory / file)[:, :, :-1] if file.endswith('.png')
+            else ski.io.imread(directory / file)
         )
         for file in filepaths
     ]
@@ -81,7 +83,7 @@ except:
 left_images = read_image_directory(LEFT_DIRECTORY)
 
 # Get all images of right-handed writing
-right_images = read_image_directory(LEFT_DIRECTORY)
+right_images = read_image_directory(RIGHT_DIRECTORY)
 
 # Combine the data into a single array
 x_data = [img for img in left_images + right_images]
