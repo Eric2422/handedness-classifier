@@ -46,11 +46,15 @@ def read_image_directory(directory_path: str | pathlib.Path) -> npt.NDArray:
     return np.array(images)
 
 
-IMAGE_DIRECTORY = pathlib.Path('./img')
+IMAGE_DIRECTORY = pathlib.Path('./images')
 """The directory that stores images of handwriting."""
-LEFT_DIRECTORY = IMAGE_DIRECTORY / 'left'
+INPUT_DIRECTORY = IMAGE_DIRECTORY / 'input'
+"""Stores the images that will be classified based on the trained model."""
+TRAINING_DIRECTORY = IMAGE_DIRECTORY / 'training'
+"""Stores the images used for training."""
+LEFT_DIRECTORY = TRAINING_DIRECTORY / 'left'
 """The directory that stores images of left-handed writing."""
-RIGHT_DIRECTORY = IMAGE_DIRECTORY / 'right'
+RIGHT_DIRECTORY = TRAINING_DIRECTORY / 'right'
 """The directory that stores images of right-handed writing."""
 
 IMAGE_FILE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
