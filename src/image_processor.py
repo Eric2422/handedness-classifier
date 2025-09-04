@@ -18,7 +18,7 @@ class ImageProcessor:
             _description_
         """
         sizes = np.array([image.shape for image in images])
-        min_num_rows = np.array(sizes[:, 0])
-        col_sizes = np.array(sizes[:, 1])
+        min_num_rows = np.array(sizes[:, 0]).min()
+        min_num_cols = np.array(sizes[:, 1]).min()
 
         return np.zeros(3, dtype=int)
