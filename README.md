@@ -14,11 +14,13 @@ See below for more details.
 [Reddit scraper]: ./src/reddit_scraper.py
 [Reddit]: https://www.reddit.com
 
-### `praw.ini`
+### [`praw.ini`]
 
 When you clone this repo, copy the contents of [`praw.ini.sample`](./praw.ini.sample)
-into a new file at `./praw.ini` to configure the Reddit crawler.
+into a new file at [`./praw.ini`] to configure the Reddit crawler.
 Then fill in the empty fields with the necessary information.
+
+[`./praw.ini`]: ./praw.ini
 
 ### [`search/`]
 
